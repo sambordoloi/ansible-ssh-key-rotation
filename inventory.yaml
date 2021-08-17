@@ -1,0 +1,9 @@
+---
+
+servers:
+  hosts:
+    testv2:
+      ansible_host: remote server ip
+      ansible_port: remote server ssh port
+      ansible_user: remote server username
+      ansible_ssh_pass: remote server pass

@@ -1,0 +1,50 @@
+---
+- name: first task
+  hosts: 127.0.0.1
+  connection: local
+  tasks:      #creating ssh key in local or jumpserver from where you will be able to ssh to remote servers
+ 
+  - name: Creates directory
+    file:
+      path: /home/ubuntu/.ssh/newsshkey
+      state: directory
+  - name: Create New SSH Key Pair
+    command: ssh-keygen -f id_rsa -t rsa -N '' -f /home/ubuntu/.ssh/newsshkey/id_rsa
+  - name: Remove Old Keys
+    command: rm -rf /home/ubuntu/.ssh/id_rsa
+
+  - name: Remove Old Pub Key
+    command: rm -rf /home/ubuntu/.ssh/id_rsa.pub
+
+  - name: Move New Key
+    command: mv /home/ubuntu/.ssh/newsshkey/id_rsa /home/ubuntu/.ssh/
+
+  - name: Move New Pub Keys
+    command: mv /home/ubuntu/.ssh/newsshkey/id_rsa.pub /home/ubuntu/.ssh/
+
+  - name: Change id_rsa Permissions
+    command: chmod 400 /home/ubuntu/.ssh/id_rsa
+
+- name: second plaay #deleting all the authorized keys and replacing with new one
+  hosts: all
+  tasks:
+
+  - name: Truncating old authorized keys in remote server
+    file:
+      path: /home/datacultr/.ssh/authorized_keys
+      state: absent
+  - name: copy id_rsa.pub from local to remote servers
+    copy:
+      src: ~/.ssh/id_rsa.pub
+      dest: /home/datacultr/.ssh/authorized_keys
+
+- name: third play   #deleting newsshkey directory from local server
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+
+  - name: Removing existing folder
+    file:
+      path: /home/datacultr/.ssh/newsshkey
+      state: absent
+
